@@ -10,6 +10,12 @@ let grid = make2DArray(nRows, nCols);
 
 function setup() {
   createCanvas(WIDTH, HEIGHT);
+
+  forEachCell(grid, cell => {
+    if (random(0, 1) > 0.5) {
+      cell.setIsMine();
+    }
+  });
 }
 
 function draw() {
@@ -43,6 +49,14 @@ function drawGrid(grid) {
   });
 }
 
+function forEachCell(grid, cb) {
+  grid.forEach(rows => {
+    rows.forEach(cell => {
+      cb(cell);
+    });
+  });
+}
+
 /**
  *
  * @param {Number} rows
@@ -63,7 +77,7 @@ function make2DArray(rows, columns) {
   return arr;
 }
 
-function cellIndex(i, j) {
-  // TODO: see how to use
-  return j * nCols + i;
-}
+// function cellIndex(i, j) {
+//   // TODO: see how to use
+//   return j * nCols + i;
+// }

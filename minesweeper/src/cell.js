@@ -9,7 +9,6 @@ class Cell {
 
   show() {
     fill(100);
-    //
     if (this.isRevealed) {
       noFill();
       if (this.isMine) {
@@ -34,8 +33,8 @@ class Cell {
     }
   }
 
-  setIsMine(isMine) {
-    this.isMine = isMine;
+  setIsMine() {
+    this.isMine = true;
   }
 
   setIsRevealed() {

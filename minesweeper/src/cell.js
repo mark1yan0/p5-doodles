@@ -41,8 +41,8 @@ class Cell {
     this.isMine = true;
   }
 
-  setIsRevealed() {
-    this.isRevealed = true;
+  setIsRevealed(revealed) {
+    this.isRevealed = revealed;
   }
 
   countNeighbours(grid) {

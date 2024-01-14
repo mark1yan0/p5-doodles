@@ -6,25 +6,25 @@ const nCols = nRows;
 
 const SIZE = WIDTH / nRows;
 
-let grid = make2DArray(nRows, nCols);
+let grid = [];
+let gameEnded = false;
+let restartButton = null;
 
 function setup() {
   createCanvas(WIDTH, HEIGHT);
-
-  forEachCell(grid, cell => {
-    if (random(0, 1) > 0.5) {
-      cell.setIsMine();
-    }
-  });
-
-  forEachCell(grid, cell => {
-    cell.countNeighbours(grid);
-  });
+  grid = bootGame();
+  createRestartButton();
 }
 
 function draw() {
   background(255);
   drawGrid(grid);
+
+  if (gameEnded) {
+    restartButton.show();
+  } else {
+    restartButton.hide();
+  }
 }
 
 function mousePressed() {
@@ -37,7 +37,12 @@ function mousePressed() {
         mouseY > cell.pos.y &&
         mouseY < cell.pos.y + SIZE
       ) {
-        cell.setIsRevealed();
+        cell.setIsRevealed(true);
+
+        if (cell.isMine) {
+          gameOver('lost');
+          gameEnded = true;
+        }
       }
     });
   });
@@ -80,7 +85,42 @@ function make2DArray(rows, columns) {
   return arr;
 }
 
-// function cellIndex(i, j) {
-//   // TODO: see how to use
-//   return j * nCols + i;
-// }
+function bootGame() {
+  grid = make2DArray(nRows, nCols);
+  forEachCell(grid, cell => {
+    if (random(0, 1) > 0.9) {
+      cell.setIsMine();
+    }
+  });
+
+  forEachCell(grid, cell => {
+    cell.countNeighbours(grid);
+  });
+
+  console.log('game started');
+  return grid;
+}
+
+function gameOver(type) {
+  switch (type) {
+    case 'lost':
+      console.log('game over: lost');
+      forEachCell(grid, cell => {
+        cell.setIsRevealed(true);
+      });
+      break;
+
+    case 'win':
+      console.log('game over: win');
+      break;
+  }
+}
+
+function createRestartButton() {
+  restartButton = createButton('Restart');
+  restartButton.position(0, HEIGHT + 100);
+  restartButton.mousePressed(() => {
+    bootGame();
+    gameEnded = false;
+  });
+}

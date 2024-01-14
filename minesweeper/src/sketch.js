@@ -80,7 +80,7 @@ function mousePressed() {
 function bootGame() {
   grid = make2DArray(nRows, nCols);
   forEachCell(grid, cell => {
-    if (random(0, 1) > 0.95) {
+    if (random(0, 1) > 0.8) {
       cell.setIsMine();
       numOfMines++;
     }

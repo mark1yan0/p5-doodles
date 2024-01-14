@@ -6,3 +6,5 @@ TODO:
 
 - [ ] display winning message correctly
 - [ ] make better UI
+- [ ] add settings for game difficulty
+- [ ] deploy online

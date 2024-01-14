@@ -1,19 +1,26 @@
 const WIDTH = 800;
 const HEIGHT = WIDTH;
 
-const nRows = 10;
+const nRows = 2;
 const nCols = nRows;
 
 const SIZE = WIDTH / nRows;
 
 let grid = [];
 let gameEnded = false;
+let gameEndedMessage = null;
 let restartButton = null;
+
+let totalCells = nRows * nCols;
+let numOfRevealed = 0;
+let numOfMines = 0;
 
 function setup() {
   createCanvas(WIDTH, HEIGHT);
   grid = bootGame();
   createRestartButton();
+  gameEndedMessage = createP();
+  gameEndedMessage.position(100, HEIGHT + 100);
 }
 
 function draw() {
@@ -22,29 +29,92 @@ function draw() {
 
   if (gameEnded) {
     restartButton.show();
+    gameEndedMessage.show();
   } else {
     restartButton.hide();
+    gameEndedMessage.hide();
   }
 }
 
 function mousePressed() {
   // detects if a cell is pressed
-  grid.forEach(rows => {
-    rows.forEach(cell => {
-      if (
-        mouseX > cell.pos.x &&
-        mouseX < cell.pos.x + SIZE &&
-        mouseY > cell.pos.y &&
-        mouseY < cell.pos.y + SIZE
-      ) {
-        cell.setIsRevealed(true);
-
-        if (cell.isMine) {
-          gameOver('lost');
-          gameEnded = true;
-        }
+  forEachCell(grid, cell => {
+    if (
+      mouseX > cell.pos.x &&
+      mouseX < cell.pos.x + SIZE &&
+      mouseY > cell.pos.y &&
+      mouseY < cell.pos.y + SIZE
+    ) {
+      if (cell.isRevealed) {
+        return;
       }
-    });
+
+      cell.setIsRevealed(true);
+
+      if (cell.isMine) {
+        gameOver('lost');
+        return;
+      }
+
+      numOfRevealed++;
+
+      if (numOfRevealed + numOfMines === totalCells) {
+        gameOver('win');
+      }
+    }
+  });
+}
+
+function bootGame() {
+  grid = make2DArray(nRows, nCols);
+  forEachCell(grid, cell => {
+    if (random(0, 1) > 0.5) {
+      cell.setIsMine();
+      numOfMines++;
+    }
+  });
+
+  forEachCell(grid, cell => {
+    cell.countNeighbours(grid);
+  });
+
+  console.log('game started');
+  return grid;
+}
+
+/**
+ *
+ * @param {'lost' | 'win'} type
+ */
+function gameOver(type) {
+  gameEnded = true;
+  switch (type) {
+    case 'lost':
+      gameEndedMessage.elt.textContent = 'Game Over: try again';
+      forEachCell(grid, cell => {
+        cell.setIsRevealed(true);
+      });
+      break;
+
+    case 'win':
+      gameEndedMessage.elt.textContent = "Congratulations: You've won!";
+      forEachCell(grid, cell => {
+        if (!cell.isRevealed) {
+          cell.setIsRevealed(true);
+        }
+      });
+      break;
+  }
+}
+
+function createRestartButton() {
+  restartButton = createButton('Restart');
+  restartButton.position(0, HEIGHT + 100);
+  restartButton.mousePressed(() => {
+    numOfMines = 0;
+    numOfRevealed = 0;
+    bootGame();
+    gameEnded = false;
   });
 }
 
@@ -83,44 +153,4 @@ function make2DArray(rows, columns) {
   }
 
   return arr;
-}
-
-function bootGame() {
-  grid = make2DArray(nRows, nCols);
-  forEachCell(grid, cell => {
-    if (random(0, 1) > 0.9) {
-      cell.setIsMine();
-    }
-  });
-
-  forEachCell(grid, cell => {
-    cell.countNeighbours(grid);
-  });
-
-  console.log('game started');
-  return grid;
-}
-
-function gameOver(type) {
-  switch (type) {
-    case 'lost':
-      console.log('game over: lost');
-      forEachCell(grid, cell => {
-        cell.setIsRevealed(true);
-      });
-      break;
-
-    case 'win':
-      console.log('game over: win');
-      break;
-  }
-}
-
-function createRestartButton() {
-  restartButton = createButton('Restart');
-  restartButton.position(0, HEIGHT + 100);
-  restartButton.mousePressed(() => {
-    bootGame();
-    gameEnded = false;
-  });
 }

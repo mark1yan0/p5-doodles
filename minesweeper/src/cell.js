@@ -14,7 +14,9 @@ class Cell {
   show() {
     fill(100);
     if (this.isRevealed) {
+      stroke(0);
       noFill();
+      rect(this.pos.x, this.pos.y, this.size, this.size);
       if (this.isMine) {
         fill(100);
         ellipse(
@@ -25,12 +27,14 @@ class Cell {
       } else {
         fill(0);
         textAlign(CENTER, CENTER);
-        textSize(30); // TODO: dynamic
-        text(
-          this.value,
-          this.pos.x + this.size / 2,
-          this.pos.y + this.size / 2
-        );
+        textSize(SIZE * 0.5);
+        if (this.value !== 0) {
+          text(
+            this.value,
+            this.pos.x + this.size / 2,
+            this.pos.y + this.size / 2
+          );
+        }
       }
     } else {
       rect(this.pos.x, this.pos.y, this.size, this.size);
@@ -41,8 +45,20 @@ class Cell {
     this.isMine = true;
   }
 
-  setIsRevealed(revealed) {
-    this.isRevealed = revealed;
+  reveal(grid) {
+    this.isRevealed = true;
+    // reveal all empty cells
+    if (typeof grid !== 'undefined') {
+      this.floodFill(grid);
+    }
+  }
+
+  floodFill(grid) {
+    this.forEachNeighbour(grid, neighbour => {
+      if (this.value === 0 && !neighbour.isRevealed) {
+        neighbour.reveal(grid);
+      }
+    });
   }
 
   countNeighbours(grid) {
@@ -50,23 +66,28 @@ class Cell {
       this.value = -1;
       return;
     }
+
+    this.forEachNeighbour(grid, neighbour => {
+      if (neighbour.isMine) {
+        this.value++;
+      }
+    });
+  }
+
+  forEachNeighbour(grid, cb) {
     /**
-    i - 1 | j - 1, i | j - 1, i + 1 | j - 1
-    i - 1 | j, i | j, i + 1, j
-    i - 1 | j + 1, i | j + 1, i + 1 | j + 1
-    */
+      i - 1 | j - 1, i | j - 1, i + 1 | j - 1
+      i - 1 | j, i | j, i + 1, j
+      i - 1 | j + 1, i | j + 1, i + 1 | j + 1
+      */
     for (let i = -1; i <= 1; i++) {
       for (let j = -1; j <= 1; j++) {
-        const currentLookup = {
-          i: this.gridIndex.i + i,
-          j: this.gridIndex.j + j,
-        };
         if (
-          grid[currentLookup.i] &&
-          grid[currentLookup.i][currentLookup.j] &&
-          grid[currentLookup.i][currentLookup.j].isMine
+          grid[this.gridIndex.i + i] &&
+          grid[this.gridIndex.i + i][this.gridIndex.j + j]
         ) {
-          this.value++;
+          const neighbour = grid[this.gridIndex.i + i][this.gridIndex.j + j];
+          cb(neighbour);
         }
       }
     }

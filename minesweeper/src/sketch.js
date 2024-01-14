@@ -1,7 +1,7 @@
 const WIDTH = 800;
 const HEIGHT = WIDTH;
 
-const nRows = 2;
+const nRows = 10;
 const nCols = nRows;
 
 const SIZE = WIDTH / nRows;
@@ -49,14 +49,14 @@ function mousePressed() {
         return;
       }
 
-      cell.setIsRevealed(true);
+      cell.reveal(grid);
+      // TODO: solve way to count auto revealed cells
+      numOfRevealed++;
 
       if (cell.isMine) {
         gameOver('lost');
         return;
       }
-
-      numOfRevealed++;
 
       if (numOfRevealed + numOfMines === totalCells) {
         gameOver('win');
@@ -68,7 +68,7 @@ function mousePressed() {
 function bootGame() {
   grid = make2DArray(nRows, nCols);
   forEachCell(grid, cell => {
-    if (random(0, 1) > 0.5) {
+    if (random(0, 1) > 0.95) {
       cell.setIsMine();
       numOfMines++;
     }
@@ -92,7 +92,7 @@ function gameOver(type) {
     case 'lost':
       gameEndedMessage.elt.textContent = 'Game Over: try again';
       forEachCell(grid, cell => {
-        cell.setIsRevealed(true);
+        cell.reveal();
       });
       break;
 
@@ -100,7 +100,7 @@ function gameOver(type) {
       gameEndedMessage.elt.textContent = "Congratulations: You've won!";
       forEachCell(grid, cell => {
         if (!cell.isRevealed) {
-          cell.setIsRevealed(true);
+          cell.reveal();
         }
       });
       break;

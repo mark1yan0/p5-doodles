@@ -5,6 +5,7 @@ class Cell {
     this.value = 0;
     this.isMine = false;
     this.isRevealed = false;
+    this.isFlagged = false;
     this.gridIndex = {
       i: this.pos.x / this.size,
       j: this.pos.y / this.size,
@@ -12,7 +13,12 @@ class Cell {
   }
 
   show() {
-    fill(100);
+    if (this.isFlagged) {
+      fill(0);
+    } else {
+      fill(100);
+    }
+
     if (this.isRevealed) {
       stroke(0);
       noFill();
@@ -39,6 +45,10 @@ class Cell {
     } else {
       rect(this.pos.x, this.pos.y, this.size, this.size);
     }
+  }
+
+  flag() {
+    this.isFlagged = true;
   }
 
   setIsMine() {

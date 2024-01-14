@@ -21,6 +21,11 @@ function setup() {
   createRestartButton();
   gameEndedMessage = createP();
   gameEndedMessage.position(100, HEIGHT + 100);
+
+  // prevent context menu un right click
+  for (let element of document.getElementsByClassName('p5Canvas')) {
+    element.addEventListener('contextmenu', e => e.preventDefault());
+  }
 }
 
 function draw() {
@@ -49,8 +54,15 @@ function mousePressed() {
         return;
       }
 
+      if (mouseButton === RIGHT) {
+        // flag cells
+        cell.flag();
+        return;
+      }
+
+      // reveal cell
       cell.reveal(grid);
-      // TODO: solve way to count auto revealed cells
+      // TODO: solve way to count auto revealed cells to win
       numOfRevealed++;
 
       if (cell.isMine) {

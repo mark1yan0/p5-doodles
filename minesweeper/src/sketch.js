@@ -16,6 +16,10 @@ function setup() {
       cell.setIsMine();
     }
   });
+
+  forEachCell(grid, cell => {
+    cell.countNeighbours(grid);
+  });
 }
 
 function draw() {
@@ -34,7 +38,6 @@ function mousePressed() {
         mouseY < cell.pos.y + SIZE
       ) {
         cell.setIsRevealed();
-        console.log(cell);
       }
     });
   });
